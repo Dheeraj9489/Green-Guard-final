@@ -63,13 +63,24 @@ def magic_kernel_resize(input_filename, output_filename, target_size=(256,256), 
     # open input
     img = Image.open(input_filename)
     # resize image
-    img = img.resize(target_size,Image.LANCZOS)
+
+    # crop image to square
+    width, height = img.size
+    new_size = min(width, height)
+    left = (width - new_size) // 2
+    right = (width + new_size) // 2
+    top = (height - new_size) // 2
+    bottom = (height + new_size) // 2
+
+    cropped_img = img.crop((left, top, right, bottom))
+    cropped_img.show()
+    cropped_img = cropped_img.resize(target_size,Image.LANCZOS)
     if extra_sharpening > 0:
         sharpener = ImageFilter.UnsharpMask(radius=2,percent=extra_sharpening, threshold=3)
-        img = img.filter(sharpener)
+        cropped_img = cropped_img.filter(sharpener)
 
     # Save resized img
-    img.save(output_filename)
+    cropped_img.save(output_filename)
 
 
 
