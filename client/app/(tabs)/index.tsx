@@ -37,6 +37,13 @@ export default function Camera() {
       const options = { allowsediting: true, quality: 1, base64: true, exif: false };
       const takenPhoto = await cameraRef.current.takePictureAsync(options);
       setPhoto(takenPhoto);
+      if (takenPhoto) {
+        setImageUri(takenPhoto.uri); // Set the image URI
+        await uploadImage(takenPhoto.uri); // Call the uploadImage function
+      } else {
+        console.log('Error: takenPhoto is undefined');
+      }
+      
       console.log(photo);
     }
   };
