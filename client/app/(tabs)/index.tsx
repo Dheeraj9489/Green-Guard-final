@@ -1,15 +1,18 @@
 import React, { useRef, useState } from 'react';
-import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {ActivityIndicator, Button, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import PhotoPreviewSection from '@/components/PhotoPreviewSection';
+import {useRouter} from "expo-router";
 
 export default function Camera() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [photo, setPhoto] = useState<any>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter(); // Initialize the router
   const cameraRef = useRef<CameraView | null>(null);
 
   if (!permission) {
@@ -62,6 +65,7 @@ export default function Camera() {
     } as any);
 
     try {
+      setLoading(true);
       const response = await fetch('http://192.168.135.206:5001/upload', {
         method: 'POST',
         body: formData,
@@ -71,9 +75,12 @@ export default function Camera() {
       });
 
       const result = await response.json();
+      setLoading(false);
       console.log('Upload result:', result);
+      router.push(`/results?plant=${encodeURIComponent(result.plant)}&disease=${encodeURIComponent(result.disease)}`); // Correctly navigate to the results tab
     } catch (error) {
       console.error('Error uploading image:', error);
+      setLoading(false);
     }
   };
 
@@ -89,9 +96,20 @@ export default function Camera() {
           <TouchableOpacity style={styles.button} onPress={handleTakePhoto}>
             <AntDesign name="camera" size={44} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={pickImage}>
-            <AntDesign name="picture" size={44} color="black" />
-          </TouchableOpacity>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity style={styles.button} onPress={pickImage}>
+                <AntDesign name="picture" size={44} color="black" />
+              </TouchableOpacity>
+            </>
+          )}
+          {/*<TouchableOpacity style={styles.button} onPress={pickImage}>*/}
+          {/*  <AntDesign name="picture" size={44} color="black" />*/}
+          {/*</TouchableOpacity>*/}
         </View>
       </CameraView>
       {imageUri && <Image source={{ uri: imageUri }} style={{ width: 256, height: 256 }} />}
@@ -100,6 +118,12 @@ export default function Camera() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

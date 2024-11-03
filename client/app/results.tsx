@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Alert } from 'react-native';
+import { View, Text, Button, Alert, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
-import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import {useRouter, useLocalSearchParams} from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 const PlantInfoComponent = () => {
-  // Sample JSON data
-  const [plantData, setPlantData] = useState({ plant: 'Tomato', disease: 'Blight' });
+  // State for plant data and loading
+  const [plantData, setPlantData] = useState({ plant: '', disease: '' });
+  const [loading, setLoading] = useState(true); // Loading state
   const router = useRouter();
   const { plant, disease } = useLocalSearchParams();
+
+  useEffect(() => {
+    const plantString = Array.isArray(plant) ? plant[0] : plant;
+    const diseaseString = Array.isArray(disease) ? disease[0] : disease;
+
+    // Set the plant data and change loading to false
+    setPlantData({ plant: plantString, disease: diseaseString });
+    setLoading(false); // Update loading state
+  }, [plant, disease]);
 
   const handleGetLocationAndSubmit = async () => {
     // Request permission to access location
@@ -25,15 +33,14 @@ const PlantInfoComponent = () => {
 
     // Prepare data for the API call
     const payload = {
-      plant,
-      disease,
+      plant: plantData.plant,
+      disease: plantData.disease,
       latitude,
       longitude,
     };
 
     // Replace with your API endpoint
     const apiEndpoint = 'http://192.168.135.206:5001/report';
-
 
     try {
       // Make the API call
@@ -70,8 +77,14 @@ const PlantInfoComponent = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Plant Information</Text>
-      <Text>Plant: {plantData.plant}</Text>
-      <Text>Disease: {plantData.disease}</Text>
+      {loading ? ( // Conditional rendering based on loading state
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <>
+          <Text>Plant: {plantData.plant}</Text>
+          <Text>Disease: {plantData.disease}</Text>
+        </>
+      )}
 
       <View style={{ marginVertical: 20 }}>
         <Button title="Get Location and Submit" onPress={handleGetLocationAndSubmit} />

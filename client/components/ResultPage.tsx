@@ -10,7 +10,9 @@ const PlantInfoComponent = () => {
   const [plantData, setPlantData] = useState({ plant: 'Tomato', disease: 'Blight' });
   const router = useRouter();
   const { plant, disease } = useLocalSearchParams();
-
+  const plantString = Array.isArray(plant) ? plant[0] : plant;
+  const diseaseString = Array.isArray(disease) ? disease[0] : disease;
+  setPlantData(({ plant: plantString, disease: diseaseString }));
   const handleGetLocationAndSubmit = async () => {
     // Request permission to access location
     let { status } = await Location.requestForegroundPermissionsAsync();
