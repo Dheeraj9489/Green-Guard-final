@@ -5,6 +5,11 @@ import {TouchableOpacity, SafeAreaView, Image, StyleSheet, View, ActivityIndicat
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {useRouter} from "expo-router";
 
+const returnTheTrash = () => {
+    const router = useRouter(); // Initialize the router
+    router.push({pathname: '/(tabs)/index'})
+}
+
 const uploadImage = async (imagePath: string) => {
     const formData = new FormData();
     const router = useRouter(); // Initialize the router

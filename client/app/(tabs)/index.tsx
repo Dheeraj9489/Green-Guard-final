@@ -39,7 +39,7 @@ export default function Camera() {
       setPhoto(takenPhoto);
       if (takenPhoto) {
         setImageUri(takenPhoto.uri); // Set the image URI
-        await uploadImage(takenPhoto.uri); // Call the uploadImage function
+        // await uploadImage(takenPhoto.uri); // Call the uploadImage function
       } else {
         console.log('Error: takenPhoto is undefined');
       }
@@ -120,7 +120,7 @@ export default function Camera() {
           {/*</TouchableOpacity>*/}
         </View>
       </CameraView>
-      {imageUri && <Image source={{ uri: imageUri }} style={{ width: 256, height: 256 }} />}
+      {/*imageUri && <Image source={{ uri: imageUri }} style={{ width: 256, height: 256 }} />*/}
     </View>
   );
 }
