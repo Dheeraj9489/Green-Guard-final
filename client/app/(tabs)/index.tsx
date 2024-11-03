@@ -120,7 +120,7 @@ export default function Camera() {
           {/*</TouchableOpacity>*/}
         </View>
       </CameraView>
-      {/*imageUri && <Image source={{ uri: imageUri }} style={{ width: 256, height: 256 }} />*/}
+      {imageUri && <Image source={{ uri: imageUri }} style={{ width: 256, height: 256 }} />}
     </View>
   );
 }

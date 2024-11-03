@@ -9,6 +9,7 @@ const PlantInfoComponent = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const router = useRouter();
   const { plant, disease } = useLocalSearchParams();
+  console.log('Plant:', plant,'Disease:', disease);
 
   useEffect(() => {
     const plantString = Array.isArray(plant) ? plant[0] : plant;
@@ -76,20 +77,20 @@ const PlantInfoComponent = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Plant Information</Text>
+      <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Plant Information</Text>
       {loading ? ( // Conditional rendering based on loading state
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
-          <Text>Plant: {plantData.plant}</Text>
-          <Text>Disease: {plantData.disease}</Text>
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>Plant: {plantData.plant}</Text>
+          <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>Disease: {plantData.disease}</Text>
         </>
       )}
 
       <View style={{ marginVertical: 20 }}>
-        <Button title="Get Location and Submit" onPress={handleGetLocationAndSubmit} />
+        <Button title="Report Disease" onPress={handleGetLocationAndSubmit} />
       </View>
-      <Button title="Go Back" onPress={handleGoBack} />
+      <Button title="Ignore" onPress={handleGoBack} />
     </View>
   );
 };
