@@ -1,31 +1,38 @@
 import { Fontisto } from '@expo/vector-icons';
 import { CameraCapturedPicture } from 'expo-camera';
 import React from 'react';
-import { TouchableOpacity, SafeAreaView, Image, StyleSheet, View } from 'react-native';
+import {TouchableOpacity, SafeAreaView, Image, StyleSheet, View, ActivityIndicator, Button} from 'react-native';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import {useRouter} from "expo-router";
 
 const uploadImage = async (imagePath: string) => {
     const formData = new FormData();
+    const router = useRouter(); // Initialize the router
+
     formData.append('image', {
-        uri: imagePath,
-        name: 'upload.jpg',
-        type: 'image/jpeg',
+      uri: imagePath,
+      name: 'upload.jpg',
+      type: 'image/jpeg',
     } as any);
 
     try {
-        const response = await fetch('http://192.168.135.206:5001/upload', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                Accept: 'application/json',
-            },
-        });
+      const response = await fetch('http://192.168.135.206:5001/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
 
-        const result = await response.json();
-        console.log('Upload result:', result);
+      const result = await response.json();
+      console.log('Upload result:', result);
+
+      // Navigate to the results page
+      router.push(`/results?plant=${encodeURIComponent(result.plant)}&disease=${encodeURIComponent(result.disease)}`); // Correctly navigate to the results tab
     } catch (error) {
-        console.error('Error uploading image:', error);
+      console.error('Error uploading image:', error);
     }
-};
+  };
 
 const PhotoPreviewSection = ({
     photo,
@@ -50,11 +57,12 @@ const PhotoPreviewSection = ({
                 <TouchableOpacity style={styles.button} onPress={handleRetakePhoto}>
                     <Fontisto name='trash' size={36} color='black' />
                 </TouchableOpacity>
+
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => uploadImage(imageUri)} // Pass the image URI here
                 >
-                    <Fontisto name='home' size={36} color='black'/>
+                    <AntDesign name='checkcircleo' size={36} color='black'/>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
