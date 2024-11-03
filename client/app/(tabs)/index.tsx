@@ -1,23 +1,25 @@
 import React, { useRef, useState } from 'react';
-import {ActivityIndicator, Button, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import { ActivityIndicator, Button, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import PhotoPreviewSection from '@/components/PhotoPreviewSection';
-import {useRouter} from "expo-router";
+import { useRouter } from "expo-router";
+import { LogBox } from 'react-native';
+import Entypo from '@expo/vector-icons/Entypo';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function Camera() {
+  LogBox.ignoreAllLogs();
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
-  const [photo, setPhoto] = useState<any>(null);
+  const [photo, setPhoto] = useState(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
   const cameraRef = useRef<CameraView | null>(null);
 
-  if (!permission) {
-    return <View />;
-  }
+  if (!permission) return <View />;
 
   if (!permission.granted) {
     return (
@@ -33,34 +35,41 @@ export default function Camera() {
   }
 
   const handleTakePhoto = async () => {
-    if (cameraRef.current) {
-      const options = { allowsediting: true, quality: 1, base64: true, exif: false };
-      const takenPhoto = await cameraRef.current.takePictureAsync(options);
-      setPhoto(takenPhoto);
-      if (takenPhoto) {
-        setImageUri(takenPhoto.uri); // Set the image URI
-        // await uploadImage(takenPhoto.uri); // Call the uploadImage function
-      } else {
-        console.log('Error: takenPhoto is undefined');
-      }
+    try {
+      if (cameraRef.current) {
+        const options = { allowsEditing: true, quality: 1, base64: true, exif: false };
+        const takenPhoto = await cameraRef.current.takePictureAsync(options);
+        setPhoto(takenPhoto);
 
-      console.log(photo);
+        if (takenPhoto) {
+          setImageUri(takenPhoto.uri);
+          await uploadImage(takenPhoto.uri);
+        } else {
+          console.error('Error: takenPhoto is undefined');
+        }
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
     }
   };
 
   const handleRetakePhoto = () => setPhoto(null);
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-      await uploadImage(result.assets[0].uri);
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+        await uploadImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
     }
   };
 
@@ -82,10 +91,14 @@ export default function Camera() {
         },
       });
 
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
       const result = await response.json();
       setLoading(false);
       console.log('Upload result:', result);
-      router.push(`/results?plant=${encodeURIComponent(result.plant)}&disease=${encodeURIComponent(result.disease)}`); // Correctly navigate to the results tab
+
+      // Ensure we only navigate once upload is complete
+      router.push(`/results?plant=${encodeURIComponent(result.plant)}&disease=${encodeURIComponent(result.disease)}`);
     } catch (error) {
       console.error('Error uploading image:', error);
       setLoading(false);
@@ -98,29 +111,23 @@ export default function Camera() {
     <View style={styles.container}>
       <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <AntDesign name="retweet" size={44} color="black" />
+          <TouchableOpacity style={styles.side_button} onPress={toggleCameraFacing}>
+            <AntDesign name="retweet" size={44} color="white" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleTakePhoto}>
-            <AntDesign name="camera" size={44} color="black" />
+            <Entypo name="circle" size={89} color="white" />
           </TouchableOpacity>
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
           ) : (
-            <>
-              <TouchableOpacity style={styles.button} onPress={pickImage}>
-                <AntDesign name="picture" size={44} color="black" />
-              </TouchableOpacity>
-            </>
+            <TouchableOpacity style={styles.side_button} onPress={pickImage}>
+              <MaterialIcons name="photo-library" size={44} color="white" />
+            </TouchableOpacity>
           )}
-          {/*<TouchableOpacity style={styles.button} onPress={pickImage}>*/}
-          {/*  <AntDesign name="picture" size={44} color="black" />*/}
-          {/*</TouchableOpacity>*/}
         </View>
       </CameraView>
-      {/*imageUri && <Image source={{ uri: imageUri }} style={{ width: 256, height: 256 }} />*/}
     </View>
   );
 }
@@ -130,7 +137,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
   },
   container: {
     flex: 1,
@@ -140,16 +147,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
+    height: 790,
     flexDirection: 'row',
     backgroundColor: 'transparent',
-    margin: 64,
+    margin: 80,
+    marginHorizontal: 10,
   },
   button: {
+    bottom: 25,           // Align it at the bottom of the screen
+    left: 0,             // Align to the left edge
+    right: 0,            // Align to the right edge
+    height: 100,          // Set a height for the container (adjust as needed)
     flex: 1,
     alignSelf: 'flex-end',
     alignItems: 'center',
-    marginHorizontal: 10,
-    backgroundColor: 'gray',
-    borderRadius: 10,
+    marginHorizontal: 1,
+    marginVertical: 5,
+    borderRadius: 15,
+    shadowOffset: { width: 0, height: 2 },
   },
+  side_button: {
+    bottom: 60,
+    flex: 1,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    marginHorizontal: 1,
+    marginVertical: 1,
+    borderRadius: 15,
+  }
 });

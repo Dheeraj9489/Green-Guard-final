@@ -20,30 +20,23 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Capture the Plant Image</ThemedText>
+        <ThemedText type="subtitle">Step 1: Capture the Leaf Image</ThemedText>
         <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
+          Select the <ThemedText type="defaultSemiBold">Upload Photo</ThemedText> tab to upload photos for diagnosis. Take a clear picture of one leaf with a solid dark background to help our machine learning model accurately analyze it. A dark background improves focus on the leaves, making it easier to detect any signs of disease.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+        <ThemedText type="subtitle">Step 2: Diagnosis</ThemedText>
         <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
+          Once you have uploaded or taken an image, our AI will analyze the data, identify any diseases present, and provide you with its name.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Step 3: Share with the Community</ThemedText>
         <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+          Connect with others in your community by sharing the diagnosis! Visit our
+          <ThemedText type="defaultSemiBold"> Explore </ThemedText>
+            tab to see nearby disease reports, to stay ahead of the wave.
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>

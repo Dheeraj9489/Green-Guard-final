@@ -5,11 +5,6 @@ import {TouchableOpacity, SafeAreaView, Image, StyleSheet, View, ActivityIndicat
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {useRouter} from "expo-router";
 
-const returnTheTrash = () => {
-    const router = useRouter(); // Initialize the router
-    router.push({pathname: '/(tabs)/index'})
-}
-
 const uploadImage = async (imagePath: string) => {
     const formData = new FormData();
     const router = useRouter(); // Initialize the router
@@ -64,7 +59,7 @@ const PhotoPreviewSection = ({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={styles.button}
+                    style={[styles.button, styles.buttonMargin]}
                     onPress={() => uploadImage(imageUri)} // Pass the image URI here
                 >
                     <AntDesign name='checkcircleo' size={36} color='black'/>
@@ -99,14 +94,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "center",
         width: '100%',
+        padding: 20,
     },
     button: {
         backgroundColor: 'gray',
         borderRadius: 25,
-        padding: 10,
+        padding: 15,
         alignItems: 'center',
         justifyContent: 'center',
-    }
+    },
+    buttonMargin: {
+        marginLeft: 30, // or whatever value you prefer
+    },
 });
 
 export default PhotoPreviewSection;
